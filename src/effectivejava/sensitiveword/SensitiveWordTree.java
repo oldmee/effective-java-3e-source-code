@@ -13,14 +13,14 @@ import java.util.logging.Logger;
  */
 public class SensitiveWordTree {
 
-    //日志
+    // 日志
     private static final Logger LOG = Logger.getLogger("SensitiveWordTree");
     // 根节点
     private static SensitiveWordNode root = null;
     // 敏感词库编码
-    private static final String ENCODING = "gbk";
+    private static final String ENCODING = "utf-8";
     // 敏感词库位置
-    private static final String filePath = "D:/1.txt";
+    private static final String filePath = "/Users/lirenren/intellijProjects/effective-java-3e-source-code/resource/1.txt";
 
     /**
      * 读取敏感词库
@@ -95,38 +95,47 @@ public class SensitiveWordTree {
      *
      * @return 所有查出的敏感词
      */
-    private static List censorWords(String text) {
+    private static String censorWords(String text) {
         if (root == null) {
             init();
         }
-        List sensitiveWords = new ArrayList();
+        StringBuilder sensitiveWords = new StringBuilder();
+        StringBuilder temp_sensitiveWords = new StringBuilder();
         char[] text_to_char = text.toCharArray();
+        SensitiveWordNode sensitiveWordNode = root;
+        SensitiveWordNode this_sensitiveWordNode = null;
         for (int start = 0; start < text_to_char.length; start++) {
-            SensitiveWordNode sensitiveWordNode = root.getNextNode(text_to_char[start]);
+            SensitiveWordNode temp_sensitiveWordNode = sensitiveWordNode.getNextNode(text_to_char[start]);
 
-            if (null != sensitiveWordNode) {
+            if (temp_sensitiveWordNode != null) {
+                temp_sensitiveWords = new StringBuilder();
+                temp_sensitiveWords.append("(" + temp_sensitiveWordNode.getKey());
+                this_sensitiveWordNode = temp_sensitiveWordNode;
+            }
 
-                while (sensitiveWordNode.getNextNodes() == null) {
-
-                    sensitiveWords.add(sensitiveWordNode.getKey());
-//                    sensitiveWordNode.
-                }
-
-                sensitiveWords.add(sensitiveWordNode.getKey());
-                if (sensitiveWordNode.isEnd()) {
-                    sensitiveWords.add(",");
+            SensitiveWordNode temp = this_sensitiveWordNode.getNextNode(text_to_char[start]);
+            if (this_sensitiveWordNode != null
+                    && temp != null
+                    && temp.getKey() == text_to_char[start]) {
+                if (temp.isEnd()
+                        && temp.getNextNodes().size() == 0) {
+                    sensitiveWords.append(temp_sensitiveWords);
+                    sensitiveWords.append(text_to_char[start] + "),");
+                    temp_sensitiveWords = new StringBuilder();
                 } else {
-
+                    temp_sensitiveWords.append(text_to_char[start]);
                 }
+                continue;
             }
 
         }
-        return sensitiveWords;
+        return sensitiveWords.toString();
     }
+
     public static void main(String[] args) {
         init();
         System.out.println(root);
-        List list = censorWords("我今天去上数学课");
+        String list = censorWords("数学和英语还有语文");
         System.out.println(list);
     }
 
