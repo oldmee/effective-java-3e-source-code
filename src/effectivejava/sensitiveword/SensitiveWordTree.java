@@ -107,26 +107,20 @@ public class SensitiveWordTree {
         for (int start = 0; start < text_to_char.length; start++) {
             SensitiveWordNode temp_sensitiveWordNode = sensitiveWordNode.getNextNode(text_to_char[start]);
 
-            if (temp_sensitiveWordNode != null) {
-                temp_sensitiveWords = new StringBuilder();
-                temp_sensitiveWords.append("(" + temp_sensitiveWordNode.getKey());
-                this_sensitiveWordNode = temp_sensitiveWordNode;
-            }
-
-            SensitiveWordNode temp = this_sensitiveWordNode.getNextNode(text_to_char[start]);
             if (this_sensitiveWordNode != null
-                    && temp != null
-                    && temp.getKey() == text_to_char[start]) {
-                if (temp.isEnd()
-                        && temp.getNextNodes().size() == 0) {
-                    sensitiveWords.append(temp_sensitiveWords);
-                    sensitiveWords.append(text_to_char[start] + "),");
-                    temp_sensitiveWords = new StringBuilder();
-                } else {
-                    temp_sensitiveWords.append(text_to_char[start]);
-                }
-                continue;
+                    && this_sensitiveWordNode.getNextNode(text_to_char[start]) != null
+                    && this_sensitiveWordNode.getNextNode(text_to_char[start]).getKey() == text_to_char[start]) {
+                sensitiveWords.append(text_to_char[start]);
             }
+            else if (temp_sensitiveWordNode != null) {
+                sensitiveWords.append(temp_sensitiveWordNode.getKey());
+            }
+            this_sensitiveWordNode = temp_sensitiveWordNode;
+
+            /*if (this_sensitiveWordNode.getNextNode(text_to_char[start]).getKey() == text_to_char[start]) {
+                this_sensitiveWordNode = temp_sensitiveWordNode;
+                sensitiveWords.append(text_to_char[start]);
+            }*/
 
         }
         return sensitiveWords.toString();
